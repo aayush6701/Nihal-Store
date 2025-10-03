@@ -38,12 +38,12 @@ export default function Footer() {
 
   <span className="flex items-center gap-3">
     <FaEnvelope className="text-xl" />
-    Email: hello@giftoo.in
+    Email: nihalcollections@gmail.in
   </span>
 
   <span className="flex items-center gap-3">
     <FaPhoneAlt className="text-xl" />
-    Phone / WhatsApp: 9322990002
+    Phone / WhatsApp: 9516335000
   </span>
 </div>
 
@@ -89,7 +89,7 @@ export default function Footer() {
     <h3 className="font-semibold text-lg mb-2">Store Info</h3>
     <ul className="space-y-2 text-base">
       <li><a href="#">About Us</a></li>
-      <li><a href="#">Giftoo Blog</a></li>
+      <li><a href="#">Our Blog</a></li>
       <li><a href="#">Offers</a></li>
       <li><a href="#">Download App Now!</a></li>
       <li><a href="#">Trust and Safety</a></li>

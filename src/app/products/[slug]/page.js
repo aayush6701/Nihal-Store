@@ -170,18 +170,21 @@ useEffect(() => {
   //   );
   // }
 
-  if (!product) {
-    return (
-      <>
-        <Navbar />
-        <main className="min-h-screen flex items-center justify-center">
-          <p className="text-red-500">Product not found</p>
-        </main>
-        <Footer />
-      </>
-    );
-  }
+  // if (!product) {
+  //   return (
+  //     <>
+  //       <Navbar />
+  //       <main className="min-h-screen flex items-center justify-center">
+  //         <p className="text-red-500">Product not found</p>
+  //       </main>
+  //       <Footer />
+  //     </>
+  //   );
+  // }
 
+  if (!product) {
+  return null; // render nothing until product loads
+}
   return (
     <>
       <Navbar />

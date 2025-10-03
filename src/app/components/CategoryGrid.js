@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 
-export default function CategoryGrid({ title, items, viewAllLink, buttonStyle = "filled" }) {
+export default function CategoryGrid({ title, items, viewAllLink, buttonStyle = "filled", setLoading }) {
   return (
     <section className="w-full bg-white px-4 md:px-8 py-6">
       {/* Category title */}
@@ -17,6 +17,7 @@ export default function CategoryGrid({ title, items, viewAllLink, buttonStyle = 
     key={index}
     href={`/products/${item.id}`}  
             className="flex flex-col bg-white rounded-lg overflow-hidden  transition-shadow duration-300"
+            onClick={() => setLoading && setLoading(true)}
           >
             {/* Image with hover effect */}
             <div className="relative w-full aspect-[1/1] overflow-hidden group">
@@ -71,6 +72,7 @@ export default function CategoryGrid({ title, items, viewAllLink, buttonStyle = 
   <Link
     href={viewAllLink}
     className="btn-fill bg-pink-500 text-white font-bold py-3 px-6  transition-colors duration-300"
+  onClick={() => setLoading && setLoading(true)}
   >
     VIEW ALL
   </Link>
@@ -78,6 +80,7 @@ export default function CategoryGrid({ title, items, viewAllLink, buttonStyle = 
             <Link
               href={viewAllLink}
               className="relative text-black font-semibold text-base pb-1 underline-animate"
+            onClick={() => setLoading && setLoading(true)}
             >
               VIEW ALL
             </Link>

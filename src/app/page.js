@@ -6,12 +6,14 @@ import CategoryGrid from './components/CategoryGrid';
 import CategoryCircleGrid from './components/CategoryCircleGrid';
 import ImageComparison from './components/ImageComparison';
 import Footer from "./components/Footer";
-
+import Spinner from "./components/Spinner";
 
 export default function Home() {
   const [sections, setSections] = useState([]);
   const [categories, setCategories] = useState([]);
   const [themes, setThemes] = useState([]);
+  const [loading, setLoading] = useState(false);
+
 
 
   useEffect(() => {
@@ -80,6 +82,7 @@ export default function Home() {
             oldPrice: p.oldPrice,
             stock: p.availability === "In Stock" ? 1 : 0,
           }))}
+          setLoading={setLoading} 
         />
       )}
 
@@ -92,6 +95,7 @@ export default function Home() {
     link: cat.link,
     products: cat.products,
   }))}
+  setLoading={setLoading}
 />
 
 
@@ -111,6 +115,7 @@ export default function Home() {
             oldPrice: p.oldPrice,
             stock: p.availability === "In Stock" ? 1 : 0,
           }))}
+          setLoading={setLoading} 
         />
       )}
       {sections[2] && (
@@ -127,6 +132,7 @@ export default function Home() {
             oldPrice: p.oldPrice,
             stock: p.availability === "In Stock" ? 1 : 0,
           }))}
+          setLoading={setLoading} 
         />
       )}
 
@@ -141,6 +147,7 @@ export default function Home() {
     products: theme.products,
   }))}
   shape="square"
+  setLoading={setLoading}
 />
 
 
@@ -161,6 +168,7 @@ export default function Home() {
             oldPrice: p.oldPrice,
             stock: p.availability === "In Stock" ? 1 : 0,
           }))}
+          setLoading={setLoading} 
         />
       )}
 
@@ -171,6 +179,12 @@ export default function Home() {
       />
 
       <Footer />
+      {loading && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999]">
+          <Spinner />
+        </div>
+      )}
+      
     </>
   );
 }

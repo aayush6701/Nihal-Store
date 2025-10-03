@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 
-export default function CategoryCircleGrid({ title, categories, shape = "circle" }) {
+export default function CategoryCircleGrid({ title, categories, setLoading, shape = "circle" }) {
   const isCircle = shape === "circle";
 
   // Shape + size classes
@@ -35,6 +35,7 @@ export default function CategoryCircleGrid({ title, categories, shape = "circle"
             key={index}
             href={cat.link || '#'}
             className="flex flex-col items-center text-center group"
+             onClick={() => setLoading && setLoading(true)}
           >
             {/* Image Wrapper */}
             <div

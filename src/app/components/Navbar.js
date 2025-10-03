@@ -15,6 +15,7 @@ import {
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRef } from "react";
+import Spinner from "./Spinner";
 
 
 export default function Navbar() {
@@ -26,8 +27,18 @@ export default function Navbar() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [pendingProductId, setPendingProductId] = useState(null);
+const pathname = typeof window !== "undefined" ? window.location.pathname : "";
 
 const [unseenAdminCount, setUnseenAdminCount] = useState(0);
+const [categories, setCategories] = useState([]);
+const [themes, setThemes] = useState([]);
+// add these below your other useState
+const [mobileCatOpen, setMobileCatOpen] = useState(false);
+const [mobileThemeOpen, setMobileThemeOpen] = useState(false);
+const [desktopCatOpen, setDesktopCatOpen] = useState(false);
+const [desktopThemeOpen, setDesktopThemeOpen] = useState(false);
+const [loading, setLoading] = useState(false);
+
 
   const [user, setUser] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
@@ -156,6 +167,30 @@ useEffect(() => {
   return () => window.removeEventListener("open-chat-with-product", handleOpenChat);
 }, []);
 
+useEffect(() => {
+  fetch(`${process.env.NEXT_PUBLIC_API_URL}/public/categories`)
+    .then(res => res.json())
+    .then(data => setCategories(data.categories || []))
+    .catch(() => setCategories([]));
+
+  fetch(`${process.env.NEXT_PUBLIC_API_URL}/public/themes`)
+    .then(res => res.json())
+    .then(data => setThemes(data.themes || []))
+    .catch(() => setThemes([]));
+}, []);
+
+useEffect(() => {
+  const handleComplete = () => setLoading(false);
+
+  router.events?.on("routeChangeComplete", handleComplete);
+  router.events?.on("routeChangeError", handleComplete);
+
+  return () => {
+    router.events?.off("routeChangeComplete", handleComplete);
+    router.events?.off("routeChangeError", handleComplete);
+  };
+}, [router]);
+
 
   const handleSendMessage = async () => {
     if (!newMessage.trim()) return;
@@ -188,7 +223,7 @@ useEffect(() => {
 
   return (
     <nav className="w-full bg-white shadow-md sticky top-0 z-50">
-      <div className="w-full px-2 sm:px-4 md:px-8 flex items-center justify-between h-[10vh] min-h-[50px] relative">
+      <div className="w-full px-2 sm:px-4 md:px-8 flex items-center justify-between h-[12vh] min-h-[50px] relative">
 
         {/* Hamburger (mobile only) */}
         <button
@@ -203,17 +238,117 @@ useEffect(() => {
           <img
             src="/logo.svg"
             alt="Logo"
-            className="h-6 sm:h-8 md:h-[8vh] w-auto max-w-[80px]"
+            className="h-20 w-28"
           />
         </div>
 
         {/* Menu (desktop, centered) */}
-        <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 space-x-6 lg:space-x-8 text-[#158278] text-base lg:text-lg">
+        {/* <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 space-x-6 lg:space-x-8 text-[#158278] text-base lg:text-lg">
           <a href="#">Home</a>
           <a href="#">About</a>
           <a href="#">Services</a>
           <a href="#">Contact</a>
-        </div>
+        </div> */}
+<div className="hidden md:flex mt-2 absolute left-1/2 transform -translate-x-1/2 space-x-6 lg:space-x-8 text-[#158278] text-base lg:text-lg">
+ <Link
+  href="/"
+  onClick={(e) => {
+    if (pathname !== "/") {
+      setLoading(true); // ✅ show loader
+    } else {
+      e.preventDefault(); // already on home → do nothing
+    }
+  }}
+>
+  Home
+</Link>
+
+
+{/* Category dropdown */}
+<div className="relative">
+  <button
+    onClick={() => {
+      setDesktopCatOpen(!desktopCatOpen);
+      setDesktopThemeOpen(false); // close theme when opening category
+    }}
+    className="hover:text-[#10655d] px-2  rounded-md transition-colors duration-200"
+  >
+    Categories
+  </button>
+  {desktopCatOpen && (
+    <div className="absolute left-0 mt-2 w-48 bg-white shadow-xl rounded-lg z-50 border border-gray-100 animate-fadeIn">
+      {categories.map(cat => (
+        <Link
+          key={cat.id}
+          href={cat.link}
+          className="block px-4 py-2 text-gray-700 hover:bg-[#f0fdfa] hover:text-[#10655d] rounded-md transition"
+          onClick={() => {
+            setDesktopCatOpen(false);
+            setLoading(true);
+          }}
+        >
+          {cat.name}
+        </Link>
+      ))}
+    </div>
+  )}
+</div>
+
+  {/* Themes dropdown */}
+<div className="relative">
+  <button
+    onClick={() => {
+      setDesktopThemeOpen(!desktopThemeOpen);
+      setDesktopCatOpen(false); // close category when opening theme
+    }}
+    className="hover:text-[#10655d] px-2  rounded-md transition-colors duration-200"
+  >
+    Themes
+  </button>
+  {desktopThemeOpen && (
+    <div className="absolute left-0 mt-2 w-48 bg-white shadow-xl rounded-lg z-50 border border-gray-100 animate-fadeIn">
+      {themes.map(th => (
+        <Link
+          key={th.id}
+          href={`/themes/${th.id}`}   // ✅ ensure same format as Home.js
+          className="block px-4 py-2 text-gray-700 hover:bg-[#f0fdfa] hover:text-[#10655d] rounded-md transition"
+          onClick={() => {
+            setDesktopThemeOpen(false);
+            setLoading(true);
+          }}
+        >
+          {th.name}
+        </Link>
+      ))}
+    </div>
+  )}
+</div>
+
+<button
+  onClick={() => {
+    const footer = document.querySelector("footer");
+    if (footer) {
+      footer.scrollIntoView({ behavior: "smooth" });
+    }
+  }}
+  className="hover:text-[#10655d]"
+>
+  About
+</button>
+
+<button
+  onClick={() => {
+    const footer = document.querySelector("footer");
+    if (footer) {
+      footer.scrollIntoView({ behavior: "smooth" });
+    }
+  }}
+  className="hover:text-[#10655d]"
+>
+  Contact
+</button>
+
+</div>
 
         {/* Icons */}
         <div className="flex space-x-3 sm:space-x-4 md:space-x-5 text-[#158278]">
@@ -292,7 +427,7 @@ useEffect(() => {
           <img
             src="/logo.svg"
             alt="Logo"
-            className="h-6 sm:h-8 w-auto"
+            className="h-16 sm:h-16 w-20"
           />
           <button
             onClick={toggleMenu}
@@ -302,10 +437,107 @@ useEffect(() => {
           </button>
         </div>
         <div className="flex flex-col px-6 py-4 space-y-4 text-[#158278] font-medium text-sm sm:text-base">
-          <a href="#" onClick={toggleMenu}>Home</a>
-          <a href="#" onClick={toggleMenu}>About</a>
-          <a href="#" onClick={toggleMenu}>Services</a>
-          <a href="#" onClick={toggleMenu}>Contact</a>
+          <Link
+  href="/"
+  onClick={(e) => {
+    if (pathname !== "/") {
+      setLoading(true); // ✅ show loader
+    } else {
+      e.preventDefault(); // already on home → do nothing
+    }
+  }}
+>
+  Home
+</Link>
+
+
+{/* Categories */}
+<div>
+  <button
+    onClick={() => {
+      setMobileCatOpen(!mobileCatOpen);
+      setMobileThemeOpen(false); // close theme when category opens
+    }}
+    className="flex items-center justify-between w-full cursor-pointer  rounded-md hover:bg-gray-50 transition"
+  >
+    Categories <span>{mobileCatOpen ? "▼" : "▶"}</span>
+  </button>
+  {mobileCatOpen && (
+    <div className="ml-4 flex flex-col mt-1 space-y-1">
+      {categories.map(cat => (
+        <Link
+          key={cat.id}
+          href={cat.link}
+          onClick={() => {
+            toggleMenu();
+            setMobileCatOpen(false);
+            setLoading(true);
+          }}
+          className="px-3 py-1 border-b rounded-md hover:bg-[#f0fdfa] hover:text-[#10655d] transition"
+        >
+          {cat.name}
+        </Link>
+      ))}
+    </div>
+  )}
+</div>
+
+{/* Themes */}
+<div>
+  <button
+    onClick={() => {
+      setMobileThemeOpen(!mobileThemeOpen);
+      setMobileCatOpen(false); // close category when theme opens
+    }}
+    className="flex items-center justify-between w-full cursor-pointer rounded-md hover:bg-gray-50 transition"
+  >
+    Themes <span>{mobileThemeOpen ? "▼" : "▶"}</span>
+  </button>
+  {mobileThemeOpen && (
+    <div className="ml-4 flex flex-col mt-1 space-y-1">
+      {themes.map(th => (
+        <Link
+          key={th.id}
+          href={`/themes/${th.id}`}   // ✅ ensure consistent path
+          onClick={() => {
+            toggleMenu();
+            setMobileThemeOpen(false);
+            setLoading(true);
+          }}
+          className="px-3 py-1 border-b rounded-md hover:bg-[#f0fdfa] hover:text-[#10655d] transition"
+        >
+          {th.name}
+        </Link>
+      ))}
+    </div>
+  )}
+</div>
+
+<button
+  onClick={() => {
+    const footer = document.querySelector("footer");
+    if (footer) {
+      footer.scrollIntoView({ behavior: "smooth" });
+    }
+  }}
+  className="flex items-center justify-between w-full cursor-pointer  rounded-md hover:bg-gray-50 transition"
+>
+  About
+</button>
+
+<button
+  onClick={() => {
+    const footer = document.querySelector("footer");
+    if (footer) {
+      footer.scrollIntoView({ behavior: "smooth" });
+    }
+  }}
+  className="flex items-center justify-between w-full cursor-pointer  rounded-md hover:bg-gray-50 transition"
+>
+  Contact
+</button>
+
+
         </div>
       </div>
 
@@ -702,6 +934,11 @@ useEffect(() => {
 
 
 
+{loading && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999]">
+    <Spinner />
+  </div>
+)}
 
     </nav>
   );
